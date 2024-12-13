@@ -8,7 +8,7 @@ class HelpdeskTeam(models.Model):
     mail_shortcode_ids = fields.Many2many('mail.shortcode')
 
     def get_templates(self):
-        # TODO: not sure we need this method
+        #  TODO: not sure we need this method
         team_ids = self.search([])
         templates = []
         for team in team_ids:

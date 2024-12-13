@@ -22,7 +22,7 @@ class ConversationExamples(models.Model):
     set_readonly = fields.Boolean()
 
     def get_conv_examples(self):
-        # TODO: not sure we need this method
+        #  TODO: not sure we need this method
         result = []
         exmpl_ids = self.with_context({'active_test': False}).search([])
         for exmpl_id in exmpl_ids:

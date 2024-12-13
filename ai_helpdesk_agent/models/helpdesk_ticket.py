@@ -28,7 +28,7 @@ class HelpdeskTicket(models.Model):
     """
     _inherit = 'helpdesk.ticket'
 
-    can_process_by_ai = fields.Boolean(default=True) # TODO: remove it
+    can_process_by_ai = fields.Boolean(default=True) #  TODO: remove it
     auto_close_time = fields.Datetime()
     conv_exml_count = fields.Integer(compute='_compute_conv_exml_count')
     total_message_by_agent = fields.Integer(compute='_compute_total_message_by_agent')
@@ -78,7 +78,7 @@ class HelpdeskTicket(models.Model):
                 request_data = request.json()
                 text = request_data.get('text', '')
                 escalate = request_data.get('actions', [])
-                reasoning = request_data.get('reasoning', '') # TODO: where to use it?
+                reasoning = request_data.get('reasoning', '') #  TODO: where to use it?
                 self.save_ticket(ticket_id, escalate, continue_conv)
                 if text:
                     ai_user_id = self.env['res.users'].search([('name', '=', 'AI Agent')], limit=1)
@@ -177,14 +177,14 @@ class HelpdeskTicket(models.Model):
                 'user_id': team_id._determine_user_to_assign()[team_id.id].id
             })
         else:
-            pass # TODO: add logic (here was "previous user" setting logic)
+            pass #  TODO: add logic (here was "previous user" setting logic)
 
     def get_ticket_info(self):
         data = self.get_request_data(self)
         return json.dumps(data)
 
     def get_request_data(self, ticket_id, messages=[]):
-        # TODO: Here was adding of attachment links
+        #  TODO: Here was adding of attachment links
         data = {
             'ticket': {
                 'ticket_id': ticket_id.id,
