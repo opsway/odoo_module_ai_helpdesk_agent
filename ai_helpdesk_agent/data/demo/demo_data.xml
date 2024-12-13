@@ -14,6 +14,7 @@
     </record>
 
     <record id="user_ai_agent" model="res.users">
+        <!-- TODO: move to Settings to select AI User?        -->
         <field name="name">AI Agent</field>
         <field name="login">ai_agent</field>
         <field name="password">ai_agent</field>
