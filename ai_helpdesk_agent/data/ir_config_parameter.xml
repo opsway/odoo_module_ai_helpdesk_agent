@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <odoo>
     <data noupdate="1">
+        <!-- TODO: move to Settings?        -->
         <function model="ir.config_parameter" name="set_param" eval="('ai_helpdesk_agent.Dry_Run_Mode', '1')"/>
         <function model="ir.config_parameter" name="set_param" eval="('ai_helpdesk_agent.Process_UI_Created_Tickets', '1')"/>
         <function model="ir.config_parameter" name="set_param" eval="('ai_helpdesk_agent.api_key', 'opsway-odoo-2024')"/>
