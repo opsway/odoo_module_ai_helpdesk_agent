@@ -1,7 +1,7 @@
 <odoo>
     <data>
-        <record id="lbs_helpdesk_ai_helpdesk_ticket_form_inherit" model="ir.ui.view">
-            <field name="name">lbs_helpdesk_ai.helpdesk.ticket.form.inherit</field>
+        <record id="ai_helpdesk_agent_helpdesk_ticket_form_inherit" model="ir.ui.view">
+            <field name="name">ai_helpdesk_agent.helpdesk.ticket.form.inherit</field>
             <field name="model">helpdesk.ticket</field>
             <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
             <field name="arch" type="xml">
@@ -15,8 +15,8 @@
             </field>
         </record>
 
-        <record id="lbs_view_helpdesk_ticket_search_inherit" model="ir.ui.view">
-            <field name="name">LBS helpdesk.ticket.search.inherit</field>
+        <record id="aihd_view_helpdesk_ticket_search_inherit" model="ir.ui.view">
+            <field name="name">AI helpdesk.ticket.search.inherit</field>
             <field name="model">helpdesk.ticket</field>
             <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_search"/>
             <field name="arch" type="xml">
@@ -29,8 +29,8 @@
             </field>
         </record>
 
-        <record id="lbs_helpdesk_ai_helpdesk_ticket_tree_inherit" model="ir.ui.view">
-            <field name="name">lbs_helpdesk_ai.helpdesk.ticket.tree.inherit</field>
+        <record id="ai_helpdesk_agent_helpdesk_ticket_tree_inherit" model="ir.ui.view">
+            <field name="name">ai_helpdesk_agent.helpdesk.ticket.tree.inherit</field>
             <field name="model">helpdesk.ticket</field>
             <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_tree"/>
             <field name="arch" type="xml">
