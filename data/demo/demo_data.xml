@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="tag_ai_reply" model="helpdesk.tag">
+        <field name="name">AI Reply</field>
+    </record>
+    <record id="tag_ai_error" model="helpdesk.tag">
+        <field name="name">AI Error</field>
+    </record>
+    <record id="tag_ai_escalation" model="helpdesk.tag">
+        <field name="name">AI Escalation</field>
+    </record>
+    <record id="tag_ai_multi_turn" model="helpdesk.tag">
+        <field name="name">AI Multi-turn</field>
+    </record>
+
+    <record id="user_ai_agent" model="res.users">
+        <field name="name">AI Agent</field>
+        <field name="login">ai_agent</field>
+        <field name="password">ai_agent</field>
+        <field name="signature" type="html">
+            <span>-- <br/>AI Agent</span>
+        </field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="company_ids" eval="[Command.link(ref('base.main_company'))]"/>
+    </record>
+
+    <function model="ir.config_parameter" name="set_param" eval="('lbs_helpdesk_ai.Dry_Run_Mode', '0')"/>
+
+    <!--TODO doesn't work        -->
+<!--    <function model="res.partner" name="write">-->
+<!--        <value model="res.partner" search="[('user_ids', '=', False),('is_company', '=', False)]"/>-->
+<!--        <value eval="{'ai_always_reply': True}"/>-->
+<!--    </function>-->
+
+</odoo>

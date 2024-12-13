@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+        <record id="lbs_helpdesk_ai_helpdesk_ticket_form_inherit" model="ir.ui.view">
+            <field name="name">lbs_helpdesk_ai.helpdesk.ticket.form.inherit</field>
+            <field name="model">helpdesk.ticket</field>
+            <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                    <button class="oe_stat_button" type="object" name="action_open_helpdesk_conv_exml"
+                            icon="fa-comments"
+                            attrs="{'invisible': [('conv_exml_count', '=', 0)]}">
+                        <field name="conv_exml_count" widget="statinfo" string="Dialogs"/>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="lbs_view_helpdesk_ticket_search_inherit" model="ir.ui.view">
+            <field name="name">LBS helpdesk.ticket.search.inherit</field>
+            <field name="model">helpdesk.ticket</field>
+            <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='unassigned']" position="after">
+                    <filter string="AI Redirected"
+                            domain="[('user_id.name','not like','AI Agent'), ('tag_ids', 'like', 'AI Reply')]"
+                            name="ai_redirected"
+                    />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="lbs_helpdesk_ai_helpdesk_ticket_tree_inherit" model="ir.ui.view">
+            <field name="name">lbs_helpdesk_ai.helpdesk.ticket.tree.inherit</field>
+            <field name="model">helpdesk.ticket</field>
+            <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='stage_id']" position="after">
+                    <field name="total_message_by_agent" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
