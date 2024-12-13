@@ -5,7 +5,7 @@ class MailThread(models.AbstractModel):
     _inherit = 'mail.thread'
 
     def _message_track_post_template(self, changes):
-        # TODO where is super call?
+        #  TODO where is super call?
         """ Based on a tracking, post a message defined by ``_track_template``
         parameters. It allows to implement automatic post of messages based
         on templates (e.g. stage change triggering automatic email).
@@ -29,7 +29,7 @@ class MailThread(models.AbstractModel):
                 continue
             # defaults to automated notifications targeting customer
             # whose answers should be considered as comments
-            post_kwargs.setdefault('message_type', 'comment') # TODO: it was 'auto_comment' instead of 'comment'
+            post_kwargs.setdefault('message_type', 'comment') #  TODO: it was 'auto_comment' instead of 'comment'
             if isinstance(template, str):
                 self._fallback_lang().message_post_with_view(template, **post_kwargs)
             else:
@@ -57,7 +57,7 @@ class MailThread(models.AbstractModel):
            :rtype: int
            :return: the id of the newly created thread object
         """
-        # TODO where is super call?
+        #  TODO where is super call?
         data = {}
         if isinstance(custom_values, dict):
             data = custom_values.copy()
