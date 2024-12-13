@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="view_conversation_examples_form" model="ir.ui.view">
-        <field name="name">lbs.conversation_examples.form</field>
-        <field name="model">lbs.conversation_examples</field>
+        <field name="name">aihd.conversation_examples.form</field>
+        <field name="model">aihd.conversation_examples</field>
         <field name="arch" type="xml">
             <form>
                 <header>
@@ -39,8 +39,8 @@
     </record>
 
     <record id="view_conversation_examples_tree" model="ir.ui.view">
-        <field name="name">lbs.conversation_examples.tree</field>
-        <field name="model">lbs.conversation_examples</field>
+        <field name="name">aihd.conversation_examples.tree</field>
+        <field name="model">aihd.conversation_examples</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="id"/>
@@ -55,7 +55,7 @@
 
     <record id="view_conversation_examples_action" model="ir.actions.act_window">
         <field name="name">Dialogs</field>
-        <field name="res_model">lbs.conversation_examples</field>
+        <field name="res_model">aihd.conversation_examples</field>
         <field name="view_mode">tree,form</field>
     </record>
 

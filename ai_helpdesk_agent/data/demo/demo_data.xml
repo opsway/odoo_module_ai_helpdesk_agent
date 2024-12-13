@@ -24,7 +24,7 @@
         <field name="company_ids" eval="[Command.link(ref('base.main_company'))]"/>
     </record>
 
-    <function model="ir.config_parameter" name="set_param" eval="('lbs_helpdesk_ai.Dry_Run_Mode', '0')"/>
+    <function model="ir.config_parameter" name="set_param" eval="('ai_helpdesk_agent.Dry_Run_Mode', '0')"/>
 
     <!--TODO doesn't work        -->
 <!--    <function model="res.partner" name="write">-->

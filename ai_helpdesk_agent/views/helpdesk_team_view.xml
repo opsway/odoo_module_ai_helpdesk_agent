@@ -1,7 +1,7 @@
 <odoo>
     <data>
-        <record id="lbs_helpdesk_ai_helpdesk_team_form_inherit" model="ir.ui.view">
-            <field name="name">lbs_helpdesk_ai.helpdesk.team.form.inherit</field>
+        <record id="ai_helpdesk_agent_helpdesk_team_form_inherit" model="ir.ui.view">
+            <field name="name">ai_helpdesk_agent.helpdesk.team.form.inherit</field>
             <field name="model">helpdesk.team</field>
             <field name="inherit_id" ref="helpdesk.helpdesk_team_view_form"/>
             <field name="arch" type="xml">
