@@ -96,13 +96,11 @@ class HelpdeskTicket(models.Model):
 
     def set_error_tag(self, ticket_id, tag_name, continue_conv=False):
         tag_id = self.env['helpdesk.tag'].search([('name', '=', tag_name)])
-        if continue_conv:
-            self.change_user(ticket_id, after_error=True)
-        else:
-            send_default_email(ticket_id)
+        self.change_user(ticket_id, after_error=True)
         ticket_id.write({
             'tag_ids': [Command.link(tag_id.id)],
         })
+        send_default_email(ticket_id)
 
     def send_request(self, data):
         api_key = self.env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.api_key', '')
@@ -146,6 +144,8 @@ class HelpdeskTicket(models.Model):
 
                 })
             ticket_id.write(data)
+            if escalate_tag_id:
+                self.change_user(ticket_id, after_error=False)
         except Exception as err:
             _logger.error(err)
 
