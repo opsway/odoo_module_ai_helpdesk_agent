@@ -61,6 +61,19 @@ class HelpdeskTicket(models.Model):
             send_default_email(ticket_id)
         return ticket_id
 
+    def mass_process_tickets(self):
+        for ticket in self:
+            ticket.write({
+                'tag_ids': False,
+            })
+            self.with_delay(priority="1").process_new_ticket(ticket)
+            try:
+                if self._context['params']['view_type'] == 'form':
+                    return {'type': 'ir.actions.client', 'tag': 'reload'}
+            except KeyError:
+                return None
+
+
     def process_new_ticket(self, ticket_id):
         try:
             data = self.get_request_data(ticket_id)
