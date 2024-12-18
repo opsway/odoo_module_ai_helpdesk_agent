@@ -127,6 +127,8 @@ class HelpdeskTicket(models.Model):
 
     def save_ticket(self, ticket_id, escalate, continue_conv):
         try:
+            if 'SKIP' in escalate:
+                return
             ticket_id = ticket_id.with_context(skip_auto_email=False)
             ai_reply_tag_id = self.env['helpdesk.tag'].search([('name', '=', 'AI Reply')], limit=1)
             multi_tag_id = self.env['helpdesk.tag'].search([('name', '=', 'AI Multi-Turn')], limit=1)
