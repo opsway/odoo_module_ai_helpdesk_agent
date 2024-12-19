@@ -17,8 +17,3 @@ class HelpdeskTeam(models.Model):
                     'substitution': canned.substitution,
                 } for canned in team.mail_shortcode_ids]
         return json.dumps(templates)
-
-
-class MailShortcode(models.Model):
-    _inherit = 'mail.shortcode'
-    _rec_name = 'source'

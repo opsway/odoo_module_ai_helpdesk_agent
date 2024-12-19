@@ -66,7 +66,3 @@ class ConversationExamplesMessage(models.Model):
     escalate = fields.Boolean()
     sequence = fields.Integer()
 
-    # @api.onchange('escalate')
-    # def _onchange_escalate(self):
-    #     if self.escalate:
-    #         self.body = 'ESCALATE'

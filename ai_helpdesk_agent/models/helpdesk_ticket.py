@@ -4,9 +4,6 @@ import random
 import logging
 import requests
 
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-
 from odoo import models, fields, api
 from odoo.fields import Command
 
@@ -182,8 +179,8 @@ class HelpdeskTicket(models.Model):
 
     def check_ab_test(self):
         try:
-            ab_percent = int(self.env["ir.config_parameter"].sudo().get_param('ai_helpdesk_agent.ab_percent'))
-        except Exception:
+            ab_percent = int(self.env["ir.config_parameter"].sudo().get_param('ai_helpdesk_agent.ab_percent'), 0)
+        except ValueError:
             ab_percent = 0
         random_number = random.randint(1, 100)
         if random_number <= ab_percent:
