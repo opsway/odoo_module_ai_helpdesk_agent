@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="tag_ai_reply" model="helpdesk.tag">
+            <field name="name">AI Reply</field>
+        </record>
+        <record id="tag_ai_error" model="helpdesk.tag">
+            <field name="name">AI Error</field>
+        </record>
+        <record id="tag_ai_escalation" model="helpdesk.tag">
+            <field name="name">AI Escalation</field>
+        </record>
+        <record id="tag_ai_multi_turn" model="helpdesk.tag">
+            <field name="name">AI Multi-turn</field>
+        </record>
+    </data>
+</odoo>

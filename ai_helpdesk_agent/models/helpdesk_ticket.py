@@ -97,13 +97,13 @@ class HelpdeskTicket(models.Model):
             self.process_ai_response(ticket_id, request, continue_conv= not is_new)
         except Exception as err:
             _logger.error(f'{ticket_id.id} AI Error, text: {err}')
-            self.set_error_tag(ticket_id, 'AI Error')
+            self.set_error_tag(ticket_id)
 
     @api.model
     def process_ai_response(self, ticket_id, request, continue_conv=False):
         dry_run = bool(int(self.env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.Dry_Run_Mode')))
         if dry_run and continue_conv or request.status_code != 200:
-            self.set_error_tag(ticket_id, 'AI Error')
+            self.set_error_tag(ticket_id)
             _logger.error(f'{ticket_id.id} AI Error, text: {request.text}, status: {request.status_code}')
             return
         request_data = request.json()
@@ -119,11 +119,11 @@ class HelpdeskTicket(models.Model):
 
     @api.model
     def set_error_tag(self, ticket_id, tag_name):
-        tag_id = self.env['helpdesk.tag'].search([('name', '=', tag_name)])
-        self.change_user(ticket_id, after_error=True)
+        err_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_error')
         ticket_id.write({
-            'tag_ids': [Command.link(tag_id.id)],
+            'tag_ids': [Command.link(err_tag_id.id)],
         })
+        self.change_user(ticket_id, after_error=True)
         send_default_email(ticket_id)
 
     @api.model
@@ -143,12 +143,12 @@ class HelpdeskTicket(models.Model):
             if 'SKIP' in escalate:
                 return
             ticket_id = ticket_id.with_context(skip_auto_email=False)
-            ai_reply_tag_id = self.env['helpdesk.tag'].search([('name', '=', 'AI Reply')], limit=1)
-            multi_tag_id = self.env['helpdesk.tag'].search([('name', '=', 'AI Multi-turn')], limit=1)
+            ai_reply_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_reply')
+            multi_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_multi_turn')
             team_id = ticket_id.team_id
             escalate_tag_id = False
             if 'ESCALATE' in escalate:
-                escalate_tag_id = self.env['helpdesk.tag'].search([('name', '=', 'AI Escalation')])
+                escalate_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_escalation')
             data = {}
             ai_user_id = get_ai_user(self.env)
             if continue_conv:

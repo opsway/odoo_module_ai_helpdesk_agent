@@ -19,6 +19,7 @@
         'security/ir.model.access.csv',
         'data/ir_config_parameter.xml',
         'data/server_actions.xml',
+        'data/helpdesk_tag.xml',
         'views/res_config_settings.xml',
         'views/res_partner_view.xml',
         'views/helpdesk_team_view.xml',

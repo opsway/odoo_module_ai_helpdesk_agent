@@ -24,7 +24,7 @@
                     <filter string="AI Redirected"
                             domain="[('user_id.name','not like','AI Agent'), ('tag_ids', 'like', 'AI Reply')]"
                             name="ai_redirected"
-                    />
+                    /> <!--                    TODO make field-->
                 </xpath>
             </field>
         </record>
