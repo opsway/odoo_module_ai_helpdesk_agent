@@ -106,7 +106,7 @@ class HelpdeskTicket(models.Model):
             data = self.get_request_data(ticket_id)
             request = self.send_request(data)
             self.process_ai_response(ticket_id, request, continue_conv= not is_new)
-        except Exception as err:
+        except Exception as err: # TODO: too wide, rollback/rerise error
             _logger.error(f'{ticket_id.id} AI Error, text: {err}')
             self.set_error_tag(ticket_id)
 
@@ -170,7 +170,7 @@ class HelpdeskTicket(models.Model):
                     'tag_ids': [Command.link(tag.id) for tag in tags],
                     'user_id': assign_to.id,
                 })
-        except Exception as err:
+        except Exception as err: # TODO: too wide, rollback/rerise error
             _logger.error(err)
 
     def check_ab_test(self):
@@ -189,7 +189,7 @@ class HelpdeskTicket(models.Model):
             team_id = ticket_id.team_id
             ticket_id.update({
                 'user_id': team_id._determine_user_to_assign()[team_id.id].id
-            })
+            }) # TODO: why update? change to write?
         else:
             pass # TODO: add logic (here was "previous user" setting logic)
 
