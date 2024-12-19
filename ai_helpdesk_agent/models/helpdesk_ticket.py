@@ -129,7 +129,7 @@ class HelpdeskTicket(models.Model):
             ticket_id.message_post(body=reasoning, message_type='comment', subtype_xmlid='mail.mt_note')
 
     @api.model
-    def set_error_tag(self, ticket_id, tag_name):
+    def set_error_tag(self, ticket_id):
         err_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_error')
         ticket_id.write({
             'tag_ids': [Command.link(err_tag_id.id)],
