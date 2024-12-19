@@ -32,7 +32,7 @@ class HelpdeskTicket(models.Model):
     """
     _inherit = 'helpdesk.ticket'
 
-    can_process_by_ai = fields.Boolean(default=True) # TODO: remove it
+    can_process_by_ai = fields.Boolean()
     auto_close_time = fields.Datetime()
     conv_exml_count = fields.Integer(compute='_compute_conv_exml_count')
     total_message_by_agent = fields.Integer(compute='_compute_total_message_by_agent')
