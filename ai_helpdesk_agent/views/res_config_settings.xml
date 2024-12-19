@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" string="Helpdesk AI" data-key="helpdesk_ai_user_id">
+                    <h2>Helpdesk AI</h2>
+                    <div class="row mt16 o_settings_container" id="helpdesk_ai_settings">
+                        <div class="col-12 col-lg-6 o_setting_box" id="helpdesk_ai_settings_ai_user">
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Choose AI User</span>
+                                <div class="text-muted">
+                                </div>
+                                <div class="content-group">
+                                    <div class="mt16 oe_inline">
+                                        <b>AI User</b> <field name="helpdesk_ai_user_id"
+                                                                  class="o_light_label text-center"/><br/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="ai_helpdesk_config_settings_action" model="ir.actions.act_window">
+        <field name="name">AI Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="res_config_settings_view_form"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'helpdesk_ai_user_id', 'bin_size': False}</field>
+    </record>
+
+    <menuitem
+            id="helpdesk_config_settings_menu"
+            name="AI Settings"
+            parent="helpdesk.helpdesk_menu_config"
+            action="ai_helpdesk_config_settings_action"
+            groups="base.group_system"
+            sequence="1000"/>
+
+</odoo>

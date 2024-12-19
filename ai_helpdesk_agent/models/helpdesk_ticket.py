@@ -21,6 +21,13 @@ def send_ai_response(ticket_id, ai_result, user_id):
     ticket_id.sudo().message_post(body=ai_result, message_type='comment', subtype_xmlid='mail.mt_comment',
                                   author_id=user_id.sudo().partner_id.id)
 
+def get_ai_user(env):
+    try:
+        settings_val = int(env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.ai_user'))
+        return env['res.users'].browse(settings_val)
+    except ValueError:
+        return env['res.users']
+
 
 class HelpdeskTicket(models.Model):
     """
@@ -35,8 +42,9 @@ class HelpdeskTicket(models.Model):
 
     def _compute_total_message_by_agent(self):
         for rec in self:
-            rec.total_message_by_agent = len(rec.message_ids.filtered(
-                lambda x: x.author_id.name != 'AI Agent' and x.body)
+            ai_user = get_ai_user(self.env)
+            rec.total_message_by_agent = bool(ai_user) and len(rec.message_ids.filtered(
+                lambda x: x.author_id != ai_user and x.body)
             )
 
     def _compute_conv_exml_count(self):
@@ -45,7 +53,7 @@ class HelpdeskTicket(models.Model):
     def _message_post_after_hook(self, message, msg_vals):
         res = super()._message_post_after_hook(message, msg_vals)
         ticket_id = self
-        ai_user = self.env['res.users'].search([('name', '=', 'AI Agent')], limit=1)
+        ai_user = get_ai_user(self.env)
         is_assigned_to_ai = ai_user and ticket_id.user_id == ai_user
         is_customer_message = message.author_id and (message.author_id == ticket_id.partner_id)
         if is_assigned_to_ai and is_customer_message and message.body:
@@ -106,7 +114,7 @@ class HelpdeskTicket(models.Model):
         escalate = request_data.get('actions', [])
         reasoning = request_data.get('reasoning', '')  # TODO: where to use it?
         self.save_ticket(ticket_id, escalate, continue_conv)
-        ai_user_id = self.env['res.users'].search([('name', '=', 'AI Agent')], limit=1)
+        ai_user_id = get_ai_user(self.env)
         if text:
             send_ai_response(ticket_id, text, ai_user_id)
         if reasoning:
@@ -145,7 +153,7 @@ class HelpdeskTicket(models.Model):
             if 'ESCALATE' in escalate:
                 escalate_tag_id = self.env['helpdesk.tag'].search([('name', '=', 'AI Escalation')])
             data = {}
-            ai_user_id = self.env['res.users'].search([('name', '=', 'AI Agent')], limit=1)
+            ai_user_id = get_ai_user(self.env)
             if continue_conv:
                 tags = [Command.link(multi_tag_id.id)]
                 if escalate_tag_id:

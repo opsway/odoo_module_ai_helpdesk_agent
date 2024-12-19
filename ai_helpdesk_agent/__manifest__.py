@@ -20,6 +20,7 @@
         'data/ir_config_parameter.xml',
         'data/cron.xml',
         'data/server_actions.xml',
+        'views/res_config_settings.xml',
         'views/res_partner_view.xml',
         'views/helpdesk_team_view.xml',
         'views/helpdesk_ticket.xml',
