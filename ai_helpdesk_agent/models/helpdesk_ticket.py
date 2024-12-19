@@ -154,37 +154,22 @@ class HelpdeskTicket(models.Model):
             if 'SKIP' in escalate:
                 return
             ticket_id = ticket_id.with_context(skip_auto_email=False)
-            ai_reply_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_reply')
-            multi_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_multi_turn')
-            team_id = ticket_id.team_id
-            escalate_tag_id = False
+            tags = self.env['helpdesk.tag']
             if 'ESCALATE' in escalate:
                 escalate_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_escalation')
-            data = {}
-            ai_user_id = get_ai_user(self.env)
-            if continue_conv:
-                tags = [Command.link(multi_tag_id.id)]
-                if escalate_tag_id:
-                    tags += [Command.link(escalate_tag_id.id)]
-                data.update({
-                    'tag_ids': tags,
-                    'user_id': ai_user_id.id,
-                })
+                tags += escalate_tag_id
+                team_id = ticket_id.team_id
+                assign_to = team_id._determine_user_to_assign()[team_id.id]
             else:
-                tags = [Command.link(ai_reply_tag_id.id)]
-                if escalate_tag_id:
-                    tags += [Command.link(escalate_tag_id.id)]
-                    assigned = team_id._determine_user_to_assign()[team_id.id]
-                else:
-                    assigned = ai_user_id
-                data.update({
-                    'tag_ids':tags,
-                    'user_id': assigned.id,
-
+                assign_to = get_ai_user(self.env)
+            if continue_conv: # continue_conv is True if it's not a new ticket
+                tags += self.env.ref('ai_helpdesk_agent.tag_ai_multi_turn')
+            else:
+                tags += self.env.ref('ai_helpdesk_agent.tag_ai_reply')
+            ticket_id.write({
+                    'tag_ids': [Command.link(tag.id) for tag in tags],
+                    'user_id': assign_to.id,
                 })
-            ticket_id.write(data)
-            if escalate_tag_id:
-                self.change_user(ticket_id, after_error=False)
         except Exception as err:
             _logger.error(err)
 
