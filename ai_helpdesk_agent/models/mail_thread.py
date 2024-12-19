@@ -80,24 +80,5 @@ class MailThread(models.AbstractModel):
 class MailMessage(models.Model):
     _inherit = 'mail.message'
 
-    @api.model_create_multi
-    def create(self, values_list):
-        messages = super().create(values_list)
-        for message in messages:
-            if message.model == 'helpdesk.ticket':
-                ticket_id = self.env['helpdesk.ticket'].browse(message.res_id)
-                if 'AI Reply' not in ticket_id.tag_ids.mapped('name'):
-                    continue
-                if 'AI Escalation' in ticket_id.tag_ids.mapped('name'):
-                    continue
-                ai_user = self.env['res.users'].search([('name', '=', 'AI Agent')], limit=1)
-                if ticket_id.user_id != ai_user:
-                    continue
-                if message.author_id.id == ticket_id.partner_id.id and message.body:
-                    self.with_delay(priority="1").process_by_ai(ticket_id)
-        return messages
-
-    def process_by_ai(self, ticket_id):
-        ai_data = ticket_id.get_request_data(ticket_id)
-        request = ticket_id.send_request(ai_data)
-        ticket_id.process_request(ticket_id, request, continue_conv=True)
+    def process_by_ai(self):
+        pass # TODO del
