@@ -36,12 +36,23 @@ class HelpdeskTicket(models.Model):
     auto_close_time = fields.Datetime()
     conv_exml_count = fields.Integer(compute='_compute_conv_exml_count')
     total_message_by_agent = fields.Integer(compute='_compute_total_message_by_agent')
+    is_ai_redirected = fields.Boolean(compute='_compute_is_ai_redirected', store=True)
 
     def _compute_total_message_by_agent(self):
         for rec in self:
             ai_user = get_ai_user(self.env)
             rec.total_message_by_agent = bool(ai_user) and len(rec.message_ids.filtered(
                 lambda x: x.author_id != ai_user and x.body)
+            )
+
+    @api.depends('user_id', 'tag_ids')
+    def _compute_is_ai_redirected(self):
+        for rec in self:
+            ai_user = get_ai_user(self.env)
+            rec.is_ai_redirected = (
+                    bool(ai_user)
+                    and ai_user != rec.user_id
+                    and self.env.ref('ai_helpdesk_agent.tag_ai_reply') in rec.tag_ids
             )
 
     def _compute_conv_exml_count(self):
