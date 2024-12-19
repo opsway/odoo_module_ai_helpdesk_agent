@@ -75,10 +75,3 @@ class MailThread(models.AbstractModel):
             })
 
         return self.create(data)
-
-
-class MailMessage(models.Model):
-    _inherit = 'mail.message'
-
-    def process_by_ai(self):
-        pass # TODO del

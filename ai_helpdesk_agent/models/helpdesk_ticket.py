@@ -111,9 +111,11 @@ class HelpdeskTicket(models.Model):
         escalate = request_data.get('actions', [])
         reasoning = request_data.get('reasoning', '')  # TODO: where to use it?
         self.save_ticket(ticket_id, escalate, continue_conv)
+        ai_user_id = self.env['res.users'].search([('name', '=', 'AI Agent')], limit=1)
         if text:
-            ai_user_id = self.env['res.users'].search([('name', '=', 'AI Agent')], limit=1)
             send_ai_response(ticket_id, text, ai_user_id)
+        if reasoning:
+            ticket_id.message_post(body=reasoning, message_type='comment', subtype_xmlid='mail.mt_note')
 
     @api.model
     def set_error_tag(self, ticket_id, tag_name):
