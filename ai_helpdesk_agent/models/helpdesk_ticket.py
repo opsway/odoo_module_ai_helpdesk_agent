@@ -22,7 +22,7 @@ def get_ai_user(env):
     try:
         settings_val = int(env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.ai_user'))
         return env['res.users'].browse(settings_val)
-    except ValueError:
+    except (ValueError, TypeError):
         return env['res.users']
 
 
@@ -190,8 +190,8 @@ class HelpdeskTicket(models.Model):
 
     def check_ab_test(self):
         try:
-            ab_percent = int(self.env["ir.config_parameter"].sudo().get_param('ai_helpdesk_agent.ab_percent'), 0)
-        except ValueError:
+            ab_percent = int(self.env["ir.config_parameter"].sudo().get_param('ai_helpdesk_agent.ab_percent'), '')
+        except (ValueError, TypeError):
             ab_percent = 0
         random_number = random.randint(1, 100)
         if random_number <= ab_percent:
