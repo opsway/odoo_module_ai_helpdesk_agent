@@ -78,11 +78,6 @@ class HelpdeskTicket(models.Model):
                 'tag_ids': False,
             })
             ticket.with_delay(priority="1").process_ticket_by_ai(is_new=True)
-            try:
-                if self._context['params']['view_type'] == 'form':
-                    return {'type': 'ir.actions.client', 'tag': 'reload'}
-            except KeyError:
-                return None
 
     def process_ticket_by_ai(self, is_new: bool):
         """
