@@ -180,17 +180,6 @@ class HelpdeskTicket(models.Model):
         except Exception as err:
             _logger.error(err)
 
-    @api.model
-    def auto_close_tickit(self):
-        ticket_ids = self.search([('auto_close_time', '<=', datetime.now())])
-        for ticket_id in ticket_ids:
-            if ticket_id.stage_id.name == 'Waiting to client':
-                stage_id = self.env['helpdesk.stage'].search([('name', '=', 'Resolved')])
-                ticket_id.write({
-                    'stage_id': stage_id.id,
-                    'auto_close_time': False
-                })
-
     def check_ab_test(self):
         try:
             ab_percent = int(self.env["ir.config_parameter"].sudo().get_param('ai_helpdesk_agent.ab_percent'))
