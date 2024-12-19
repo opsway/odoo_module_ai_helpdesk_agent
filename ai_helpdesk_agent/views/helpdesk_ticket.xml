@@ -22,7 +22,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='unassigned']" position="after">
                     <filter string="AI Redirected"
-                            domain="[('user_id.name','not like','AI Agent'), ('tag_ids', 'like', 'AI Reply')]"
+                            domain="[('is_ai_redirected','=',True)]"
                             name="ai_redirected"
                     />
                 </xpath>
