@@ -17,7 +17,7 @@
     <function model="ir.config_parameter" name="set_param" eval="('ai_helpdesk_agent.ai_user', ref('user_ai_agent'))"/>
 
 
-    <!--TODO doesn't work        -->
+    <!--TODO: make it works        -->
 <!--    <function model="res.partner" name="write">-->
 <!--        <value model="res.partner" search="[('user_ids', '=', False),('is_company', '=', False)]"/>-->
 <!--        <value eval="{'ai_always_reply': True}"/>-->

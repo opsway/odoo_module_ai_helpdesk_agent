@@ -124,7 +124,7 @@ class HelpdeskTicket(models.Model):
         request_data = request.json()
         text = request_data.get('text', '')
         escalate = request_data.get('actions', [])
-        reasoning = request_data.get('reasoning', '')  # TODO: where to use it?
+        reasoning = request_data.get('reasoning', '')
         self._save_ticket(escalate, continue_conv)
         ai_user_id = get_ai_user(self.env)
         if text:
