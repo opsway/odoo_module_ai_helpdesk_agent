@@ -1,5 +1,5 @@
 import json
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class HelpdeskTeam(models.Model):
@@ -7,7 +7,9 @@ class HelpdeskTeam(models.Model):
 
     mail_shortcode_ids = fields.Many2many('mail.shortcode')
 
+    @api.model
     def get_templates(self):
+        """Needs for API"""
         team_ids = self.search([])
         templates = []
         for team in team_ids:

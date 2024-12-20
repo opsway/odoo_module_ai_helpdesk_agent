@@ -1,5 +1,5 @@
 import json
-from odoo import models, fields
+from odoo import models, fields, api
 from odoo.exceptions import AccessError
 
 class ConversationExamples(models.Model):
@@ -21,8 +21,9 @@ class ConversationExamples(models.Model):
     active = fields.Boolean(default=True)
     set_readonly = fields.Boolean()
 
+    @api.model
     def get_conv_examples(self):
-        # TODO: not sure we need this method
+        """Needs for API"""
         result = []
         exmpl_ids = self.with_context({'active_test': False}).search([])
         for exmpl_id in exmpl_ids:
