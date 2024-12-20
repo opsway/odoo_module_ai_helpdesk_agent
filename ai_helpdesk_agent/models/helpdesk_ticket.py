@@ -154,8 +154,6 @@ class HelpdeskTicket(models.Model):
     def save_ticket(self, escalate, continue_conv):
         self.ensure_one()
         try:
-            if 'SKIP' in escalate:
-                return
             self = self.with_context(skip_auto_email=False)
             tags = self.env['helpdesk.tag']
             if 'ESCALATE' in escalate:
