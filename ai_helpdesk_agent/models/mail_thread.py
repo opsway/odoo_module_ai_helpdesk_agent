@@ -5,6 +5,7 @@ class MailThread(models.AbstractModel):
 
     @api.model
     def message_new(self, msg_dict, custom_values=None):
+        """Mark a ticket if it is created from email"""
         if self._name == 'helpdesk.ticket':
             custom_values = custom_values or {}
             custom_values.update({

@@ -7,7 +7,7 @@
             <field name="binding_model_id" ref="helpdesk.model_helpdesk_ticket"/>
             <field name="binding_view_types">form</field>
             <field name="state">code</field>
-            <field name="code">action = records.action_conv_expl()</field>
+            <field name="code">action = records._action_conv_expl()</field>
         </record>
 
         <record id="model_helpdesk_ticket_action_mass_process" model="ir.actions.server">
@@ -16,7 +16,7 @@
             <field name="binding_model_id" ref="helpdesk.model_helpdesk_ticket"/>
             <field name="binding_view_types">form,list</field>
             <field name="state">code</field>
-            <field name="code">action = records.mass_process_tickets()</field>
+            <field name="code">action = records._mass_process_tickets()</field>
         </record>
     </data>
 </odoo>

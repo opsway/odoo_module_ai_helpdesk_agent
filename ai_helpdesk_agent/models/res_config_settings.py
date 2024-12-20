@@ -7,5 +7,6 @@ class ResConfigSettings(models.TransientModel):
     helpdesk_ai_user_id = fields.Many2one(
         'res.users',
         domain=[('share', '=', False)],
-        config_parameter='ai_helpdesk_agent.ai_user'
+        config_parameter='ai_helpdesk_agent.ai_user',
+        help='Only internal users can be selected',
     )

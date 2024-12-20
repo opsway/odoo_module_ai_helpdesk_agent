@@ -15,5 +15,5 @@ class Main(http.Controller):
     def get_ticket_data(self, ticket_id, **kwargs):
         _logger.error(ticket_id)
         ticket = request.env['helpdesk.ticket'].browse(ticket_id)
-        data = ticket.get_request_data()
+        data = ticket._get_request_data()
         return json.dumps(data)
