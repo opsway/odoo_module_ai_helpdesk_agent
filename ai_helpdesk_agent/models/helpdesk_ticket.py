@@ -7,6 +7,8 @@ import requests
 from odoo import models, fields, api
 from odoo.fields import Command
 
+from ..const import AIActions
+
 _logger = logging.getLogger(__name__)
 
 
@@ -134,7 +136,7 @@ class HelpdeskTicket(models.Model):
         self.ensure_one()
         self = self.with_context(skip_auto_email=False)
         tags = self.env['helpdesk.tag']
-        if 'ESCALATE' in escalate:
+        if AIActions.ESCALATE in escalate:
             escalate_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_escalation')
             tags += escalate_tag_id
             team_id = self.team_id
