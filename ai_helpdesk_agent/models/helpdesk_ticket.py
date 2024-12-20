@@ -105,14 +105,9 @@ class HelpdeskTicket(models.Model):
         param is_new: bool In case it isn't a new ticket, then process as continue of conversation
         """
         self.ensure_one()
-        try:
-            ticket_id = self
-            data = self.get_request_data()
-            request = self.send_request(data)
-            self.process_ai_response(request, continue_conv=not is_new)
-        except Exception as err: # TODO: too wide, rollback/rerise error
-            _logger.error(f'{ticket_id.id} AI Error, text: {err}')
-            self.set_error_tag()
+        data = self.get_request_data()
+        request = self.send_request(data)
+        self.process_ai_response(request, continue_conv=not is_new)
 
     def process_ai_response(self, request, continue_conv):
         dry_run = bool(int(self.env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.Dry_Run_Mode')))
@@ -153,26 +148,23 @@ class HelpdeskTicket(models.Model):
 
     def save_ticket(self, escalate, continue_conv):
         self.ensure_one()
-        try:
-            self = self.with_context(skip_auto_email=False)
-            tags = self.env['helpdesk.tag']
-            if 'ESCALATE' in escalate:
-                escalate_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_escalation')
-                tags += escalate_tag_id
-                team_id = self.team_id
-                assign_to = team_id._determine_user_to_assign()[team_id.id]
-            else:
-                assign_to = get_ai_user(self.env)
-            if continue_conv: # continue_conv is True if it's not a new ticket
-                tags += self.env.ref('ai_helpdesk_agent.tag_ai_multi_turn')
-            else:
-                tags += self.env.ref('ai_helpdesk_agent.tag_ai_reply')
-            self.write({
-                    'tag_ids': [Command.link(tag.id) for tag in tags],
-                    'user_id': assign_to.id,
-                })
-        except Exception as err: # TODO: too wide, rollback/rerise error
-            _logger.error(err)
+        self = self.with_context(skip_auto_email=False)
+        tags = self.env['helpdesk.tag']
+        if 'ESCALATE' in escalate:
+            escalate_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_escalation')
+            tags += escalate_tag_id
+            team_id = self.team_id
+            assign_to = team_id._determine_user_to_assign()[team_id.id]
+        else:
+            assign_to = get_ai_user(self.env)
+        if continue_conv: # continue_conv is True if it's not a new ticket
+            tags += self.env.ref('ai_helpdesk_agent.tag_ai_multi_turn')
+        else:
+            tags += self.env.ref('ai_helpdesk_agent.tag_ai_reply')
+        self.write({
+                'tag_ids': [Command.link(tag.id) for tag in tags],
+                'user_id': assign_to.id,
+            })
 
     @api.model
     def check_ab_test(self):
