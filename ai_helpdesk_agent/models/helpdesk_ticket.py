@@ -7,6 +7,8 @@ import requests
 from odoo import models, fields, api
 from odoo.fields import Command
 
+from ..const import AIActions
+
 _logger = logging.getLogger(__name__)
 
 
@@ -20,23 +22,40 @@ def send_ai_response(ticket_id, ai_result, user_id):
 
 def get_ai_user(env):
     try:
-        settings_val = int(env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.ai_user'))
+        settings_val = int(env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.ai_user', 0))
         return env['res.users'].browse(settings_val)
     except (ValueError, TypeError):
         return env['res.users']
 
 
 class HelpdeskTicket(models.Model):
-    """
-    :field can_process_by_ai: define triggers to set True for AI processing
-    """
     _inherit = 'helpdesk.ticket'
 
     can_process_by_ai = fields.Boolean()
-    auto_close_time = fields.Datetime()
     conv_exml_count = fields.Integer(compute='_compute_conv_exml_count')
     total_message_by_agent = fields.Integer(compute='_compute_total_message_by_agent')
     is_ai_redirected = fields.Boolean(compute='_compute_is_ai_redirected', store=True)
+
+    def get_ticket_info(self):
+        """Needs for API"""
+        data = self._get_request_data()
+        return json.dumps(data)
+
+    def _mass_process_tickets(self):
+        for ticket in self:
+            ticket.write({
+                'tag_ids': False,
+            })
+            ticket.with_delay(priority="1")._process_ticket_by_ai(is_new=True)
+
+    def _process_ticket_by_ai(self, is_new: bool):
+        """ Main method to process ticket by AI
+        param is_new: bool In case it isn't a new ticket, then process as continue of conversation
+        """
+        self.ensure_one()
+        data = self._get_request_data()
+        request = self._send_request(data)
+        self._process_ai_response(request, continue_conv=not is_new)
 
     def _compute_total_message_by_agent(self):
         for rec in self:
@@ -59,13 +78,13 @@ class HelpdeskTicket(models.Model):
         self.conv_exml_count = len(self.env['aihd.conversation_examples'].search([('ticket_id', '=', self.id)]))
 
     def _message_post_after_hook(self, message, msg_vals):
+        """AI replies to Customer's messages. Odoo core hook"""
         res = super()._message_post_after_hook(message, msg_vals)
-        ticket_id = self
         ai_user = get_ai_user(self.env)
-        is_assigned_to_ai = ai_user and ticket_id.user_id == ai_user
-        is_customer_message = message.author_id and (message.author_id == ticket_id.partner_id)
+        is_assigned_to_ai = ai_user and self.user_id == ai_user
+        is_customer_message = message.author_id and (message.author_id == self.partner_id)
         if is_assigned_to_ai and is_customer_message and message.body:
-            ticket_id.with_delay(priority="1").process_ticket_by_ai(is_new=False)
+            self.with_delay(priority="1")._process_ticket_by_ai(is_new=False)
         return res
 
     @api.model_create_multi
@@ -74,71 +93,76 @@ class HelpdeskTicket(models.Model):
         ticket_ids = super(HelpdeskTicket, self).create(vals_list)
         for ticket_id in ticket_ids:
             is_processed_by_ai = False
-            process_on_creation = bool(int(self.env['ir.config_parameter'].sudo(
-                ).get_param('ai_helpdesk_agent.Process_UI_Created_Tickets', 0)))
-            if process_on_creation and not ticket_id.user_id:
-                ticket_id.can_process_by_ai = True
+            ticket_id._mark_can_process_by_ai()
             if ticket_id.can_process_by_ai:
                 customer_flag = ticket_id.partner_id.ai_always_reply
-                included_in_an_test = self.check_ab_test()
+                included_in_an_test = self._check_ab_test()
                 if customer_flag or included_in_an_test:
-                    ticket_id.with_delay(priority="1").process_ticket_by_ai(is_new=True)
+                    ticket_id.with_delay(priority="1")._process_ticket_by_ai(is_new=True)
                     is_processed_by_ai = True
             if not is_processed_by_ai:
                 send_default_email(ticket_id)
         return ticket_ids
 
-    def mass_process_tickets(self):
-        for ticket in self:
-            ticket.write({
-                'tag_ids': False,
-            })
-            ticket.with_delay(priority="1").process_ticket_by_ai(is_new=True)
-
-    def process_ticket_by_ai(self, is_new: bool):
-        """
-        param ticket_id: helpdesk.ticket
-        param is_new: bool. If it isn't a new ticket then process as continue of conversation
-        """
-        self.ensure_one()
+    def _mark_can_process_by_ai(self):
+        """For cases when ticket creates without an assigned user, mostly through UI"""
         try:
-            ticket_id = self
-            data = self.get_request_data(ticket_id)
-            request = self.send_request(data)
-            self.process_ai_response(ticket_id, request, continue_conv= not is_new)
-        except Exception as err: # TODO: too wide, rollback/rerise error
-            _logger.error(f'{ticket_id.id} AI Error, text: {err}')
-            self.set_error_tag(ticket_id)
+            process_on_creation = bool(int(self.env['ir.config_parameter'].sudo(
+            ).get_param('ai_helpdesk_agent.Process_UI_Created_Tickets', 0)))
+        except (ValueError, TypeError):
+            process_on_creation = False
+        for ticket_id in self:
+            if process_on_creation and not ticket_id.user_id:
+                ticket_id.can_process_by_ai = True
 
-    @api.model
-    def process_ai_response(self, ticket_id, request, continue_conv=False):
-        dry_run = bool(int(self.env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.Dry_Run_Mode')))
+    def _process_ai_response(self, request, continue_conv):
+        dry_run = bool(int(self.env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.Dry_Run_Mode', 0)))
         if dry_run and continue_conv or request.status_code != 200:
-            self.set_error_tag(ticket_id)
-            _logger.error(f'{ticket_id.id} AI Error, text: {request.text}, status: {request.status_code}')
+            self._set_error_tag()
+            _logger.error(f'{self.id} AI Error, text: {request.text}, status: {request.status_code}')
             return
         request_data = request.json()
         text = request_data.get('text', '')
         escalate = request_data.get('actions', [])
-        reasoning = request_data.get('reasoning', '')  # TODO: where to use it?
-        self.save_ticket(ticket_id, escalate, continue_conv)
+        reasoning = request_data.get('reasoning', '')
+        self._save_ticket(escalate, continue_conv)
         ai_user_id = get_ai_user(self.env)
         if text:
-            send_ai_response(ticket_id, text, ai_user_id)
+            send_ai_response(self, text, ai_user_id)
         if reasoning:
-            ticket_id.message_post(body=reasoning, message_type='comment', subtype_xmlid='mail.mt_note')
+            self.message_post(body=reasoning, message_type='comment', subtype_xmlid='mail.mt_note')
+
+    def _save_ticket(self, escalate, continue_conv):
+        self.ensure_one()
+        self = self.with_context(skip_auto_email=False)
+        tags = self.env['helpdesk.tag']
+        if AIActions.ESCALATE in escalate:
+            escalate_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_escalation')
+            tags += escalate_tag_id
+            team_id = self.team_id
+            assign_to = team_id._determine_user_to_assign()[team_id.id]
+        else:
+            assign_to = get_ai_user(self.env)
+        if continue_conv: # continue_conv is True if it's not a new ticket
+            tags += self.env.ref('ai_helpdesk_agent.tag_ai_multi_turn')
+        else:
+            tags += self.env.ref('ai_helpdesk_agent.tag_ai_reply')
+        self.write({
+                'tag_ids': [Command.link(tag.id) for tag in tags],
+                'user_id': assign_to.id,
+            })
 
     @api.model
-    def set_error_tag(self, ticket_id):
+    def _set_error_tag(self):
         err_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_error')
-        ticket_id.write({
+        self.write({
             'tag_ids': [Command.link(err_tag_id.id)],
         })
-        self.change_user(ticket_id, after_error=True)
-        send_default_email(ticket_id)
+        self._change_user()
+        send_default_email(self)
 
     @api.model
-    def send_request(self, data):
+    def _send_request(self, data):
         api_key = self.env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.api_key', '')
         api_ulr = self.env['ir.config_parameter'].sudo().get_param('ai_helpdesk_agent.api_ulr', '')
         headers = {
@@ -149,33 +173,9 @@ class HelpdeskTicket(models.Model):
         return request
 
     @api.model
-    def save_ticket(self, ticket_id, escalate, continue_conv):
+    def _check_ab_test(self):
         try:
-            if 'SKIP' in escalate:
-                return
-            ticket_id = ticket_id.with_context(skip_auto_email=False)
-            tags = self.env['helpdesk.tag']
-            if 'ESCALATE' in escalate:
-                escalate_tag_id = self.env.ref('ai_helpdesk_agent.tag_ai_escalation')
-                tags += escalate_tag_id
-                team_id = ticket_id.team_id
-                assign_to = team_id._determine_user_to_assign()[team_id.id]
-            else:
-                assign_to = get_ai_user(self.env)
-            if continue_conv: # continue_conv is True if it's not a new ticket
-                tags += self.env.ref('ai_helpdesk_agent.tag_ai_multi_turn')
-            else:
-                tags += self.env.ref('ai_helpdesk_agent.tag_ai_reply')
-            ticket_id.write({
-                    'tag_ids': [Command.link(tag.id) for tag in tags],
-                    'user_id': assign_to.id,
-                })
-        except Exception as err: # TODO: too wide, rollback/rerise error
-            _logger.error(err)
-
-    def check_ab_test(self):
-        try:
-            ab_percent = int(self.env["ir.config_parameter"].sudo().get_param('ai_helpdesk_agent.ab_percent'), '')
+            ab_percent = int(self.env["ir.config_parameter"].sudo().get_param('ai_helpdesk_agent.ab_percent', 0))
         except (ValueError, TypeError):
             ab_percent = 0
         random_number = random.randint(1, 100)
@@ -184,36 +184,32 @@ class HelpdeskTicket(models.Model):
         else:
             return False
 
-    def change_user(self, ticket_id, after_error=False):
-        if after_error:
-            team_id = ticket_id.team_id
-            ticket_id.update({
-                'user_id': team_id._determine_user_to_assign()[team_id.id].id
-            }) # TODO: why update? change to write?
-        else:
-            pass # TODO: add logic (here was "previous user" setting logic)
+    def _change_user(self):
+        self.ensure_one()
+        team_id = self.team_id
+        self.write({
+            'user_id': team_id._determine_user_to_assign()[team_id.id].id
+        })
 
-    def get_ticket_info(self):
-        data = self.get_request_data(self)
-        return json.dumps(data)
-
-    def get_request_data(self, ticket_id, messages=[]):
-        # TODO: Here was adding of attachment links
+    def _get_request_data(self, messages=[]):
+        # TODO: Add attachments from messages?
+        self.ensure_one()
         data = {
             'ticket': {
-                'ticket_id': ticket_id.id,
-                'subject': ticket_id.name if ticket_id.name else '',
-                'description': str(ticket_id.description) if ticket_id.description else '',
-                'ticket_type': ticket_id.ticket_type_id.name if ticket_id.ticket_type_id.name else '',
-                'customer_name': ticket_id.partner_id.name if ticket_id.partner_id.name else '',
-                'customer_email': ticket_id.partner_id.email if ticket_id.partner_id.email else '',
+                'ticket_id': self.id,
+                'subject': self.name if self.name else '',
+                'description': str(self.description) if self.description else '',
+                'ticket_type': self.ticket_type_id.name if self.ticket_type_id.name else '',
+                'customer_name': self.partner_id.name if self.partner_id.name else '',
+                'customer_email': self.partner_id.email if self.partner_id.email else '',
                 'question': '',
                 'messages': messages,
             },
         }
         return data
 
-    def action_conv_expl(self):
+    def _action_conv_expl(self):
+        self.ensure_one()
         dialog_id = self.env['aihd.conversation_examples'].create([{
             'ticket_id': self.id,
             'subject': self.name,
@@ -238,6 +234,8 @@ class HelpdeskTicket(models.Model):
         }
 
     def action_open_helpdesk_conv_exml(self):
+        """button, it must be a public method"""
+        self.ensure_one()
         return {
             'name': 'Conversation Example',
             'view_mode': 'tree,form',
