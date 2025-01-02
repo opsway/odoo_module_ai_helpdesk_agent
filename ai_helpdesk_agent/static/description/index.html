@@ -5,9 +5,10 @@
             <h1 class="text-center" style="font-size: 48px;">AI Helpdesk Ticket Processing</h1>
             <h2 class="text-center" style="font-size: 20px; font-weight: 400;">Process tickets with AI and send responses to customers.</h2>
             <div class="mt-4">
-                <img class="w-100" style="border-radius: 10px;" src="ai_helpdesk.png" />
+                <img class="w-100" style="border-radius: 10px;" src="ai_helpdesk.png" alt="AI Helpdesk Overview" />
             </div>
         </div>
+
         <div class="mt-3 bg-white" style="border-radius: 10px; box-shadow: -40px 40px 160px 0 rgb(0 0 0 / 8%), -8px 8px 15px 0 rgb(120 120 120 / 4%), 3px 3px 30px 0 rgb(0 0 0 / 4%) !important;">
             <div class="tab-content p-4">
                 <div class="tab-pane fade active show" role="tabpanel">
@@ -24,20 +25,10 @@
                     </div>
 
                     <div class="d-flex flex-column p-4 mb-4" style="background-color: #f3f5f7; border-radius: 10px;">
-                        <h4 class="text-center" style="font-size: 20px;">Settings You Can Adjust</h4>
-                        <ul style="list-style: circle; padding-left: 20px;">
-                            <li><b>AI Processing Percentage:</b> Decide how many tickets the AI should handle (default: 0%).</li>
-                            <li><b>Test Users:</b> Define users that will always receive AI replies, even if the processing percentage is set to 0%.</li>
-                            <li><b>Dry Mode:</b> Test how the AI works without sending actual replies to the customers (logs will be gathered in the AI bot monitoring system).</li>
-                            <li><b>AI Agent:</b> Choose which user the system will use for AI-generated replies.</li>
-                        </ul>
-                    </div>
-
-                    <div class="d-flex flex-column p-4 mb-4" style="background-color: #f3f5f7; border-radius: 10px;">
                         <h4 class="text-center" style="font-size: 20px;">How It Works</h4>
-                        <ul style="list-style: circle; padding-left: 20px;">
+                        <ul style="list-style: disc; padding-left: 20px;">
                             <li><b>When a Ticket is Created:</b>
-                                <ul>
+                                <ul style="list-style: circle; padding-left: 20px;">
                                     <li>The system sends the ticket to the AI.</li>
                                     <li>If the AI processes it successfully: Adds an <i>AI Reply</i> tag and assigns it to the AI agent.</li>
                                     <li>If there’s an error: Adds an <i>AI Error</i> tag and assigns it to a human agent.</li>
@@ -45,7 +36,7 @@
                                 </ul>
                             </li>
                             <li><b>When a Customer Replies:</b>
-                                <ul>
+                                <ul style="list-style: circle; padding-left: 20px;">
                                     <li>If the ticket is assigned to the AI agent, the system sends it back to the AI.</li>
                                     <li>If processed successfully: Adds an <i>AI Multi-turn</i> tag.</li>
                                 </ul>
@@ -54,23 +45,38 @@
                     </div>
 
                     <div class="d-flex flex-column p-4 mb-4" style="background-color: #f3f5f7; border-radius: 10px;">
-                        <h4 class="text-center" style="font-size: 20px;">Training the AI</h4>
-                        <ul style="list-style: circle; padding-left: 20px;">
-                            <li>Add examples from real tickets or create new ones manually.</li>
-                            <li>Ensure examples have valid roles and content (no empty fields).</li>
-                            <li>Save examples as drafts or publish them for the AI to use.</li>
-                        </ul>
-                    </div>
-
-                    <div class="d-flex flex-column p-4 mb-4" style="background-color: #f3f5f7; border-radius: 10px;">
-                        <h4 class="text-center" style="font-size: 20px;">Force Ticket Processing</h4>
-                        <ul style="list-style: circle; padding-left: 20px;">
-                            <li>You can force processing tickets to AI in cases of any outages:</li>
-                            <ul>
-                                <li>This can be done from two separate screens: mass action and action from the ticket.</li>
-                                <li>All AI-related tags will be cleared, and current user assignments disregarded.</li>
-                                <li>The ticket will be processed by the AI as a priority.</li>
-                            </ul>
+                        <h4 class="text-center" style="font-size: 20px;">Examples in Action</h4>
+                        <ul style="list-style: disc; padding-left: 20px;">
+                            <li>
+                                <h5>AI Reply Generation</h5>
+                                <p>Shows the AI generating replies and adding relevant tags to the ticket for tracking. Pay attention to the tag and reasoning provided.</p>
+                                <img src="ai_reply.gif" alt="AI Reply Generation" style="width: 100%; border-radius: 10px;">
+                            </li>
+                            <li class="mt-3">
+                                <h5>AI Multi-Turn Conversations</h5>
+                                <p>Shows how the AI manages multi-turn conversations, maintaining context across customer replies.</p>
+                                <img src="ai_multiturn.gif" alt="AI Multi-Turn Conversations" style="width: 100%; border-radius: 10px;">
+                            </li>
+                            <li class="mt-3">
+                                <h5>AI Escalation</h5>
+                                <p>Demonstrates how the AI identifies issues that require human attention and escalates them effectively. Note the tags and reasoning used in this flow.</p>
+                                <img src="ai_escalate.gif" alt="AI Escalation" style="width: 100%; border-radius: 10px;">
+                            </li>
+                            <li class="mt-3">
+                                <h5>AI Error Handling</h5>
+                                <p>Illustrates how the system handles AI processing errors and escalates the ticket to a human agent for further processing or re-processing.</p>
+                                <img src="ai_error.gif" alt="AI Error Handling" style="width: 100%; border-radius: 10px;">
+                            </li>
+                            <li class="mt-3">
+                                <h5>Force Ticket Processing</h5>
+                                <p>Explains how to force AI processing during outages or exceptions, ensuring continuity.</p>
+                                <img src="force_ai_reply.gif" alt="Force Ticket Processing" style="width: 100%; border-radius: 10px;">
+                            </li>
+                            <li class="mt-3">
+                                <h5>Create Dialog for Training</h5>
+                                <p>Shows how to create example dialogs to feed into the LLM fine-tuning pipeline. Includes options for saving as drafts or publishing.</p>
+                                <img src="ai_dialog.gif" alt="Create Dialog for Training" style="width: 100%; border-radius: 10px;">
+                            </li>
                         </ul>
                     </div>
                 </div>

@@ -6,3 +6,7 @@ __pycache__/
 
 #Pycharm
 /.idea
+
+*.jsonl
+*.csv
+*.json
