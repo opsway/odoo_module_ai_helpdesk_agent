@@ -1,43 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <record id="ai_helpdesk_agent_helpdesk_ticket_form_inherit" model="ir.ui.view">
-            <field name="name">ai_helpdesk_agent.helpdesk.ticket.form.inherit</field>
-            <field name="model">helpdesk.ticket</field>
-            <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
-                    <button class="oe_stat_button" type="object" name="action_open_helpdesk_conv_exml"
-                            icon="fa-comments"
-                            attrs="{'invisible': [('conv_exml_count', '=', 0)]}">
-                        <field name="conv_exml_count" widget="statinfo" string="Dialogs"/>
-                    </button>
-                </xpath>
-            </field>
-        </record>
+    <record id="ai_helpdesk_agent_helpdesk_ticket_form_inherit" model="ir.ui.view">
+        <field name="name">ai_helpdesk_agent.helpdesk.ticket.form.inherit</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button type="object"
+                        name="action_open_helpdesk_conv_exml"
+                        class="btn btn-secondary"
+                        icon="fa-comments"
+                        invisible="conv_exml_count == 0">
+                    <field name="conv_exml_count" class="me-1"/>Dialogs
+                </button>
+            </xpath>
+        </field>
+    </record>
 
-        <record id="aihd_view_helpdesk_ticket_search_inherit" model="ir.ui.view">
-            <field name="name">AI helpdesk.ticket.search.inherit</field>
-            <field name="model">helpdesk.ticket</field>
-            <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_search"/>
-            <field name="arch" type="xml">
-                <xpath expr="//filter[@name='unassigned']" position="after">
-                    <filter string="AI Redirected"
-                            domain="[('is_ai_redirected','=',True)]"
-                            name="ai_redirected"
-                    />
-                </xpath>
-            </field>
-        </record>
+    <record id="aihd_view_helpdesk_ticket_search_inherit" model="ir.ui.view">
+        <field name="name">AI helpdesk.ticket.search.inherit</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_search"/>
+        <field name="arch" type="xml">
+            <filter name="unassigned" position="after">
+                <filter string="AI Redirected"
+                        name="ai_redirected"
+                        domain="[('is_ai_redirected', '=', True)]"/>
+            </filter>
+        </field>
+    </record>
 
-        <record id="ai_helpdesk_agent_helpdesk_ticket_tree_inherit" model="ir.ui.view">
-            <field name="name">ai_helpdesk_agent.helpdesk.ticket.tree.inherit</field>
-            <field name="model">helpdesk.ticket</field>
-            <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='stage_id']" position="after">
-                    <field name="total_message_by_agent" optional="show"/>
-                </xpath>
+    <record id="ai_helpdesk_agent_helpdesk_ticket_tree_inherit" model="ir.ui.view">
+        <field name="name">ai_helpdesk_agent.helpdesk.ticket.tree.inherit</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_tickets_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="stage_id" position="after">
+                <field name="total_message_by_agent" optional="show"/>
             </field>
-        </record>
-    </data>
+        </field>
+    </record>
 </odoo>

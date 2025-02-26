@@ -7,7 +7,7 @@ import requests
 from odoo import models, fields, api
 from odoo.fields import Command
 
-from ..const import AIActions
+from ..const import AIActions, HTML_FOR_AI_RESPONSE
 
 _logger = logging.getLogger(__name__)
 
@@ -17,7 +17,8 @@ def send_default_email(ticket_id):
 
 
 def send_ai_response(ticket_id, ai_result, user_id):
-    ticket_id.sudo().message_post(body=ai_result, message_type='comment', subtype_xmlid='mail.mt_comment',
+    ticket_id.sudo().message_post(body=ai_result, body_is_html=HTML_FOR_AI_RESPONSE,
+                                  message_type='comment', subtype_xmlid='mail.mt_comment',
                                   author_id=user_id.sudo().partner_id.id)
 
 def get_ai_user(env):
@@ -130,7 +131,8 @@ class HelpdeskTicket(models.Model):
         if text:
             send_ai_response(self, text, ai_user_id)
         if reasoning:
-            self.message_post(body=reasoning, message_type='comment', subtype_xmlid='mail.mt_note')
+            self.message_post(body=reasoning, body_is_html=HTML_FOR_AI_RESPONSE,
+                              message_type='comment', subtype_xmlid='mail.mt_note')
 
     def _save_ticket(self, escalate, continue_conv):
         self.ensure_one()
@@ -199,7 +201,6 @@ class HelpdeskTicket(models.Model):
                 'ticket_id': self.id,
                 'subject': self.name if self.name else '',
                 'description': str(self.description) if self.description else '',
-                'ticket_type': self.ticket_type_id.name if self.ticket_type_id.name else '',
                 'customer_name': self.partner_id.name if self.partner_id.name else '',
                 'customer_email': self.partner_id.email if self.partner_id.email else '',
                 'question': '',
@@ -214,7 +215,6 @@ class HelpdeskTicket(models.Model):
             'ticket_id': self.id,
             'subject': self.name,
             'description': str(self.description),
-            'ticket_type_id': self.ticket_type_id.id,
             'partner_id': self.partner_id.id,
             'customer_name': self.partner_id.name,
             'customer_email': self.partner_id.email,

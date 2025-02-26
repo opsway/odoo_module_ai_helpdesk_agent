@@ -11,7 +11,6 @@ class ConversationExamples(models.Model):
     ticket_id = fields.Many2one('helpdesk.ticket')
     subject = fields.Char()
     description = fields.Char()
-    ticket_type_id = fields.Many2one('helpdesk.ticket.type')
     partner_id = fields.Many2one('res.partner')
     customer_name = fields.Char()
     customer_email = fields.Char()
@@ -32,7 +31,6 @@ class ConversationExamples(models.Model):
                     'ticket_id': exmpl_id.ticket_id.id,
                     'subject': '',
                     'description': exmpl_id.description,
-                    'ticket_type': exmpl_id.ticket_type_id.name,
                     'status': exmpl_id.state if exmpl_id.active else 'archived',
                     'last_update_at': str(exmpl_id.write_date.timestamp()).split('.')[0],
                     'customer_name': exmpl_id.customer_name,

@@ -5,7 +5,7 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[hasclass('settings')]" position="inside">
+            <xpath expr="//form" position="inside">
                 <div class="app_settings_block" string="Helpdesk AI" data-key="helpdesk_ai_user_id">
                     <h2>Helpdesk AI</h2>
                     <div class="row mt16 o_settings_container" id="helpdesk_ai_settings">
