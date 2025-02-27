@@ -122,6 +122,9 @@ class HelpdeskTicket(models.Model):
             self._set_error_tag()
             _logger.error(f'{self.id} AI Error, text: {request.text}, status: {request.status_code}')
             return
+        if dry_run:
+            send_default_email(self)
+            return
         request_data = request.json()
         text = request_data.get('text', '')
         escalate = request_data.get('actions', [])
