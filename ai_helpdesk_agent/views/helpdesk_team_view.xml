@@ -1,18 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <record id="ai_helpdesk_agent_helpdesk_team_form_inherit" model="ir.ui.view">
-            <field name="name">ai_helpdesk_agent.helpdesk.team.form.inherit</field>
-            <field name="model">helpdesk.team</field>
-            <field name="inherit_id" ref="helpdesk.helpdesk_team_view_form"/>
-            <field name="arch" type="xml">
-              <xpath expr="//div[hasclass('oe_title')]" position="after">
-                    <div>
-                        <br/>
-                        <label for="mail_shortcode_ids" string="Canned responses: "/>
-                        <h3><field name="mail_shortcode_ids" widget="many2many_tags"/></h3>
+    <record id="ai_helpdesk_agent_helpdesk_team_form_inherit" model="ir.ui.view">
+        <field name="name">ai_helpdesk_agent.helpdesk.team.form.inherit</field>
+        <field name="model">helpdesk.team</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_team_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <label for="mail_shortcode_ids" string="Canned responses"/>
+                        <field name="mail_shortcode_ids" widget="many2many_tags"/>
                     </div>
-                </xpath>
-            </field>
-        </record>
-    </data>
+                </div>
+            </xpath>
+        </field>
+    </record>
 </odoo>

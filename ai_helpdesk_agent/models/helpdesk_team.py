@@ -5,7 +5,7 @@ from odoo import models, fields, api
 class HelpdeskTeam(models.Model):
     _inherit = 'helpdesk.team'
 
-    mail_shortcode_ids = fields.Many2many('mail.shortcode')
+    mail_shortcode_ids = fields.Many2many('mail.canned.response')
 
     @api.model
     def get_templates(self):
