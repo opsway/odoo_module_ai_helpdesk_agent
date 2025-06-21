@@ -1,6 +1,6 @@
 {
     'name': 'AI Helpdesk Agent',
-    'version': '16.0.0.1.2',
+    'version': '17.0.0.1.0',
     'summary': 'Process tickets with AI and send responses to customers.',
     'description': 'AI for helpdesk tickets',
     'category': 'Services/Helpdesk',
